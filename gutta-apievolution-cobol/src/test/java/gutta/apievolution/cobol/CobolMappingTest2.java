@@ -202,24 +202,20 @@ class CobolMappingTest2 {
 	private static KundeRecResolution createKundeRecResolution() {
         KundeRecResolution kundeRes = new KundeRecResolution();
         //NameNew
-        kundeRes.setVorname_In_Namenew(KundeConstants.VORNAME);
-        kundeRes.setNachnameprolonged_In_Namenew(KundeConstants.NACHNAME);
-        kundeRes.setNachname_In_Namenew(KundeConstants.NACHNAME);
+        kundeRes.setVorname(KundeConstants.VORNAME);
+        kundeRes.setNachnameprolonged(KundeConstants.NACHNAME);
+        kundeRes.setNachname(KundeConstants.NACHNAME);
         //GeburtsdatumNew
-        kundeRes.setGeburtsdatumTag(KundeConstants.GEBURTSDATUM_TAG);
-        kundeRes.setGeburtsdatumMonat(KundeConstants.GEBURTSDATUM_MONAT);
-        kundeRes.setGeburtsdatumJahr(KundeConstants.GEBURTSDATUM_JAHR);
+        kundeRes.setGeburtsdatumtag(KundeConstants.GEBURTSDATUM_TAG);
+        kundeRes.setGeburtsdatummonat(KundeConstants.GEBURTSDATUM_MONAT);
+        kundeRes.setGeburtsdatumjahr(KundeConstants.GEBURTSDATUM_JAHR);
         
         kundeRes.setFestnetznummer(KundeConstants.FESTNETZNUMMER);
         kundeRes.setMobilfunknummer(KundeConstants.MOBILFUNKNUMMER);
         kundeRes.setMailadresseshortened(KundeConstants.MAILADRESSE);
         //Name
-        kundeRes.setVorname_In_Name(KundeConstants.VORNAME);
-        kundeRes.setNachnameprolonged_In_Name(KundeConstants.NACHNAME);
-        kundeRes.setNachname_In_Name(KundeConstants.NACHNAME);
-        
         kundeRes.setGeschlecht(KundeConstants.GESCHLECHT);
-        kundeRes.setGeburtsdatum_In_Kunde(KundeConstants.GEBURTSDATUM);
+        kundeRes.setGeburtsdatum(KundeConstants.GEBURTSDATUM);
         kundeRes.setMailadresse(KundeConstants.MAILADRESSE);
         
         return kundeRes;
