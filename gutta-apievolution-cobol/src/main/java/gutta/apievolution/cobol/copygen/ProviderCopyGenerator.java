@@ -23,8 +23,6 @@ public class ProviderCopyGenerator {
 		CobolModelBuilder builder = new CobolModelBuilder(5, 5);
 
 		mergedDefinition.forEach(u -> builder.build(u));
-		builder.getKnownGroupRecords().values().forEach(v -> System.out.println(v.isGroupRecord()));
-		builder.getKnownElementaryRecords().values().forEach(v -> System.out.println(v.isGroupRecord()));
 		
         Properties properties = new Properties();
         properties.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");

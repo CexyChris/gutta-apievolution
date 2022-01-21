@@ -43,7 +43,11 @@ public class CobolModelBuilder implements ProviderApiDefinitionElementVisitor<Co
 //			cached.increaseLevelNr(this.levelNrIncrement);
 //			return cached;
 //		}
-		GroupCobolRecord groupCobolRecord = new GroupCobolRecord(recordType.getInternalName(), this.LevelNr);
+		return this.createGroupRecord(recordType.getInternalName(), recordType);
+	}
+	
+	private GroupCobolRecord createGroupRecord(String name, ProviderRecordType recordType) {
+		GroupCobolRecord groupCobolRecord = new GroupCobolRecord(name, this.LevelNr);
 		this.LevelNr += this.levelNrIncrement;
 		for(ProviderField providerField : recordType.getDeclaredFields()) {
 			this.currentName = providerField.getInternalName();
@@ -51,9 +55,10 @@ public class CobolModelBuilder implements ProviderApiDefinitionElementVisitor<Co
 			groupCobolRecord.addItem(subordinateItem);
 		}
 		this.LevelNr -= this.levelNrIncrement;
-		this.knownGroupRecords.put(recordType.getInternalName(), groupCobolRecord);
+		this.knownGroupRecords.put(name, groupCobolRecord);
 		return groupCobolRecord;
 	}
+	
 	
 	
 	@Override
@@ -76,7 +81,7 @@ public class CobolModelBuilder implements ProviderApiDefinitionElementVisitor<Co
 	
 	@Override
 	public CobolRecord handleRecordType(RecordType<?, ?, ?> recordType) {
-		return this.handleProviderRecordType((ProviderRecordType) recordType);
+		return this.createGroupRecord(this.currentName, (ProviderRecordType) recordType);
 	}
 
 	public Map<String, GroupCobolRecord> getKnownGroupRecords() {
