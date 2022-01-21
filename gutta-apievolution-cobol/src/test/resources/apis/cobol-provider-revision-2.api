@@ -19,7 +19,7 @@ api test.provider {
 	}
 
     record TestResult as Kunde {                                             
-	    NameRec          Name as NameNew
+	    NameRec          Name
 	    GeburtsdatumRec  Geburtsdatum as GeburtsdatumNew		
 		numeric(16)      Festnetznummer replaces Telefonnummer
 		numeric(16)      Mobilfunknummer
