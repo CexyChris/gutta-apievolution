@@ -10,14 +10,16 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 
+import gutta.apievolution.core.apimodel.consumer.ConsumerApiDefinition;
 import gutta.apievolution.core.apimodel.provider.ProviderApiDefinition;
 import gutta.apievolution.core.util.IntegerRange;
+import gutta.apievolution.dsl.ConsumerApiLoader;
 import gutta.apievolution.dsl.ProviderApiLoader;
 
 class CopyGeneratorTest {
 	
 	@Test
-	void test() throws IOException {
+	void providerTest() throws IOException {
 		ClassLoader classLoader = this.getClass().getClassLoader();
         List<InputStream> streams = Stream.of("apis/cobol-provider-revision-1.api",
                 "apis/cobol-provider-revision-2.api")
@@ -28,7 +30,20 @@ class CopyGeneratorTest {
 		= ProviderApiLoader.loadHistoryFromStreams(IntegerRange.unbounded(), streams);
 		
 		File file = new File("myProviderCopy.cbl");
-		ProviderCopyGenerator.generateCopies(apiDefinitions, "Kunde", file);
+		ProviderCopyGenerator generator = new ProviderCopyGenerator();
+		generator.generateCopy(apiDefinitions, "Kunde", file);
+		
+	}
+	
+	@Test
+	void test() throws IOException {
+		ClassLoader classLoader = this.getClass().getClassLoader();
+		InputStream inputStream = classLoader.getResourceAsStream("apis/cobol-consumer-api.api");
+        ConsumerApiDefinition consumerApi = ConsumerApiLoader.loadFromStream(inputStream, 0);
+		
+		File file = new File("myConsumerCopy.cbl");
+		ConsumerCopyGenerator generator = new ConsumerCopyGenerator();
+		generator.generateCopy(consumerApi, "Kunde", file);
 		
 	}
 

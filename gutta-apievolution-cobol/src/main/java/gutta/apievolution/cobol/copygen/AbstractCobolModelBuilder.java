@@ -4,15 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import gutta.apievolution.core.apimodel.BoundedStringType;
+import gutta.apievolution.core.apimodel.Field;
 import gutta.apievolution.core.apimodel.NumericType;
 import gutta.apievolution.core.apimodel.RecordType;
 import gutta.apievolution.core.apimodel.TypeVisitor;
-import gutta.apievolution.core.apimodel.provider.ProviderApiDefinitionElement;
-import gutta.apievolution.core.apimodel.provider.ProviderApiDefinitionElementVisitor;
-import gutta.apievolution.core.apimodel.provider.ProviderField;
-import gutta.apievolution.core.apimodel.provider.ProviderRecordType;
 
-public class CobolModelBuilder implements ProviderApiDefinitionElementVisitor<CobolRecord>, TypeVisitor<CobolRecord> {
+abstract class AbstractCobolModelBuilder implements TypeVisitor<CobolRecord>{
 	
 	private Map<String, GroupCobolRecord> knownGroupRecords;
 	private Map<String, ElementaryCobolRecord> knownElementaryRecords;
@@ -20,36 +17,35 @@ public class CobolModelBuilder implements ProviderApiDefinitionElementVisitor<Co
 	private final int levelNrIncrement;
 	private String currentName;
 	
-	CobolModelBuilder(int minLevelNr, int levelNrIncrement) {
+	
+	AbstractCobolModelBuilder(int minLevelNr, int levelNrIncrement) {
 		this.knownGroupRecords = new HashMap<String, GroupCobolRecord>();
 		this.knownElementaryRecords = new HashMap<String, ElementaryCobolRecord>();
 		this.LevelNr = minLevelNr;
 		this.levelNrIncrement = levelNrIncrement;
 	}
 	
-	public void build(ProviderApiDefinitionElement element) {
-        element.accept(this);
-    }
-	
 	public GroupCobolRecord getForName(String name) {
 		return this.knownGroupRecords.get(name);
 	}
 	
+	public Map<String, GroupCobolRecord> getKnownGroupRecords() {
+		return this.knownGroupRecords;
+	}
+
+	public Map<String, ElementaryCobolRecord> getKnownElementaryRecords() {
+		return this.knownElementaryRecords;
+	}
 	
-	@Override
-	public CobolRecord handleProviderRecordType(ProviderRecordType recordType) {
+	GroupCobolRecord createGroupRecord(String name, RecordType<?,?,?> recordType) {
 //		CobolRecord cached = this.knownGroupRecords.get(recordType.getInternalName());
 //		if (cached != null) {
 //			cached.increaseLevelNr(this.levelNrIncrement);
 //			return cached;
 //		}
-		return this.createGroupRecord(recordType.getInternalName(), recordType);
-	}
-	
-	private GroupCobolRecord createGroupRecord(String name, ProviderRecordType recordType) {
 		GroupCobolRecord groupCobolRecord = new GroupCobolRecord(name, this.LevelNr);
 		this.LevelNr += this.levelNrIncrement;
-		for(ProviderField providerField : recordType.getDeclaredFields()) {
+		for(Field providerField : recordType.getDeclaredFields()) {
 			this.currentName = providerField.getInternalName();
 			CobolRecord subordinateItem = providerField.getType().accept(this);
 			groupCobolRecord.addItem(subordinateItem);
@@ -58,8 +54,6 @@ public class CobolModelBuilder implements ProviderApiDefinitionElementVisitor<Co
 		this.knownGroupRecords.put(name, groupCobolRecord);
 		return groupCobolRecord;
 	}
-	
-	
 	
 	@Override
 	public CobolRecord handleNumericType(NumericType numericType) {
@@ -80,16 +74,8 @@ public class CobolModelBuilder implements ProviderApiDefinitionElementVisitor<Co
 	}
 	
 	@Override
-	public CobolRecord handleRecordType(RecordType<?, ?, ?> recordType) {
-		return this.createGroupRecord(this.currentName, (ProviderRecordType) recordType);
+	public CobolRecord handleRecordType(RecordType recordType) {
+		return this.createGroupRecord(this.currentName, recordType);
 	}
-
-	public Map<String, GroupCobolRecord> getKnownGroupRecords() {
-		return this.knownGroupRecords;
-	}
-
-	public Map<String, ElementaryCobolRecord> getKnownElementaryRecords() {
-		return this.knownElementaryRecords;
-	}	
 
 }

@@ -5,6 +5,7 @@ import gutta.apievolution.core.apimodel.ApiDefinition;
 import gutta.apievolution.core.apimodel.QualifiedName;
 
 import java.util.Set;
+import java.util.function.Consumer;
 
 /**
  * Consumer-specific implementation of an {@link ApiDefinition}.
@@ -32,6 +33,14 @@ public class ConsumerApiDefinition extends ApiDefinition<ConsumerApiDefinition> 
      */
     public int getReferencedRevision() {
         return this.referencedRevision;
+    }
+    
+    /**
+     * Performs the given action for each element of this API definition.
+     * @param action The action to perform
+     */
+    public void forEach(Consumer<ConsumerApiDefinitionElement> action) {
+    	this.getUserDefinedTypes().forEach(udt -> action.accept( (ConsumerApiDefinitionElement) udt ) );
     }
 
     @Override
