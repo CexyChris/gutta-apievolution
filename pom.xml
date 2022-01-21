@@ -101,6 +101,7 @@
     </dependencyManagement>
 
     <modules>
+    	<module>gutta-apievolution-cobol</module>
         <module>gutta-apievolution-core</module>
         <module>gutta-apievolution-dsl</module>
         <module>gutta-apievolution-java-codegen-plugin</module>

@@ -1,0 +1,29 @@
+#if ( $root.LevelNr == 1 )
+	#set ( $indentation = '    ' )     ## fuer Lvl 01 nach Area A 
+#else 
+    #set ( $indentation = '        ' ) ## fuer andere Lvl Area B
+#end
+#set ( $indentationIncrement = '  ' )
+##
+#macro ( generateRecords $group )
+##
+${indentation}$group.TwoDigitLevelNr  ${group.RecordName}.
+##
+#set ( $oldIndentation = "$indentation" )
+#set ( $indentation = "${indentation}${indentationIncrement}" )
+##
+#foreach ( $record in $group.GroupItems ) 
+#if ( $record.GroupRecord )
+##
+#generateRecords( $groupRecordMap.get($record.RecordName) )
+##
+#else
+#set ( $elementaryRec = $elementaryRecordMap.get($record.RecordName) ) 
+${indentation}$elementaryRec.TwoDigitLevelNr  $elementaryRec.RecordName  	${elementaryRec.PictureClause}.
+#end
+#end
+##
+#set ( $indentation = "$oldIndentation" )
+#end
+
+#generateRecords( $root )

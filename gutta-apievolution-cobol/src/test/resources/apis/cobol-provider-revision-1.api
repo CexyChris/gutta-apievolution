@@ -1,0 +1,21 @@
+api test.provider {
+
+//    record TestParameter as KundenNr {
+//        string(16) KundenNr
+//    }
+    
+    record NameRec as Name {
+    	string(64)   Vorname
+	    string(1)    NameFiller1 as FILLER
+	    string(32)   Nachname
+	}
+	
+    record TestResult as Kunde {                                             
+	    NameRec      Name
+	    string(10)   Geburtsdatum                   
+		string(1)    Geschlecht
+		numeric(16)  Telefonnummer                    
+		string(512)  Mailadresse
+    }
+
+}
