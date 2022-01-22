@@ -7,5 +7,8 @@ public class CobolConstants {
 	        
 	public static final String SHORTHAND_USAGE_CLAUSE = "USAGE";
 	public static final String FULL_USAGE_CLAUSE = "USAGE IS";
+	
+	public static final String MOVE = "MOVE";
+	public static final String TO   = "TO";
 
 }
