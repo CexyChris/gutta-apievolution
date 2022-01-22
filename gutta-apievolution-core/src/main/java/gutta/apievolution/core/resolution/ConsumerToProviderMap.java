@@ -124,6 +124,10 @@ class ConsumerToProviderMap {
     Type mapConsumerType(Type consumerType) {
         return this.consumerToProviderType.get(consumerType);
     }
+    
+    ProviderField mapConsumerField(ConsumerField consumerField) {
+    	return this.consumerToProviderField.get(consumerField);
+    }
 
     private class ConsumerTypeConsistencyChecker implements TypeVisitor<Void> {
 

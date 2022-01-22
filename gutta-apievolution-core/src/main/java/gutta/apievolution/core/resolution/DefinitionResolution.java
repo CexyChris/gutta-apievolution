@@ -100,5 +100,14 @@ public class DefinitionResolution {
     public ConsumerField mapProviderField(ProviderField providerField) {
         return this.providerToConsumerMap.mapProviderField(providerField);
     }
+    
+    /**
+     * Maps a given consumer field to the corresponding provider field.
+     * @param consumerField The consumer field to map
+     * @return The corresponding provider field, if it exists
+     */
+    public ProviderField mapConsumerField(ConsumerField consumerField) {
+        return this.consumerToProviderMap.mapConsumerField(consumerField);
+    }
 
 }
