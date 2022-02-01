@@ -1,0 +1,15 @@
+      *---------------------------------------------------------------
+      * Generated Code:
+#if( $direction == "in" ) 
+      * Mapping Consumer Input to respective Provider Fields.
+      *---------------------------------------------------------------
+ #else
+      * Mapping Provider Output to respective Consumer Fields.
+      *---------------------------------------------------------------
+#end
+#foreach ( $moveStmnt in $moves )
+       $moveStmnt
+#end
+      *---------------------------------------------------------------
+      * End of generated Code.
+      *---------------------------------------------------------------  

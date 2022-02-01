@@ -1,5 +1,6 @@
 package gutta.apievolution.cobol.copygen;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -54,7 +55,23 @@ class MoveGeneratorTest {
         Set<Integer> supportedRevisions = new HashSet<>(Arrays.asList(0, 1));
         
         MoveGenerator generator = new MoveGenerator();
-        generator.generateOutputMoves(providerRevisionHistory, supportedRevisions, consumerApi, "Kunde", null);
+        
+        File outMoves = new File("myOutputMoves");
+        generator.generateOutputMoves(providerRevisionHistory, supportedRevisions, consumerApi, "Kunde", outMoves);
+	}
+	
+	@Test
+	void InputMoveTest() throws Exception {
+		RevisionHistory providerRevisionHistory = this.loadRevisionHistory("apis/cobol-provider-revision-1.api",
+                "apis/cobol-provider-revision-2.api");
+        ConsumerApiDefinition consumerApi = this.loadConsumerApi("apis/cobol-consumer-api.api", 0);
+
+        Set<Integer> supportedRevisions = new HashSet<>(Arrays.asList(0, 1));
+        
+        MoveGenerator generator = new MoveGenerator();
+        
+        File inMoves = new File("myInputMoves");
+        generator.generateInputMoves(providerRevisionHistory, supportedRevisions, consumerApi, "Kunde", inMoves);
 	}
 
 }

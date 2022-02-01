@@ -11,6 +11,14 @@ public class MoveStatement {
 		this.from = from;
 		this.to = to;
 	}
+	
+	public String getFrom() {
+		return from;
+	}
+
+	public String getTo() {
+		return to;
+	}
 
 	@Override
 	public int hashCode() {
