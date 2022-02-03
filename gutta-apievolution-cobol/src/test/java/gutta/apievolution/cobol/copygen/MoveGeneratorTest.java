@@ -56,7 +56,7 @@ class MoveGeneratorTest {
         
         MoveGenerator generator = new MoveGenerator();
         
-        File outMoves = new File("myOutputMoves");
+        File outMoves = new File("myOutputMoves.cbl");
         generator.generateOutputMoves(providerRevisionHistory, supportedRevisions, consumerApi, "Kunde", outMoves);
 	}
 	
@@ -70,7 +70,7 @@ class MoveGeneratorTest {
         
         MoveGenerator generator = new MoveGenerator();
         
-        File inMoves = new File("myInputMoves");
+        File inMoves = new File("myInputMoves.cbl");
         generator.generateInputMoves(providerRevisionHistory, supportedRevisions, consumerApi, "Kunde", inMoves);
 	}
 
