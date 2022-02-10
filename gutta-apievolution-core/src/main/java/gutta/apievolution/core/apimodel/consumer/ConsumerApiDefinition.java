@@ -4,8 +4,10 @@ import gutta.apievolution.core.apimodel.Annotation;
 import gutta.apievolution.core.apimodel.ApiDefinition;
 import gutta.apievolution.core.apimodel.QualifiedName;
 
+import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Consumer-specific implementation of an {@link ApiDefinition}.
@@ -64,4 +66,14 @@ public class ConsumerApiDefinition extends ApiDefinition<ConsumerApiDefinition> 
                 this.referencedRevision == that.referencedRevision;
     }
 
+    @Override
+    protected void propagateInheritedFields() {
+        List<ConsumerRecordType> recordTypes = this.getUserDefinedTypes().stream()
+                .filter(ConsumerRecordType.class::isInstance)
+                .map(ConsumerRecordType.class::cast)
+                .collect(Collectors.toList());
+
+        ConsumerInheritedFieldPropagator propagator = new ConsumerInheritedFieldPropagator();
+        propagator.propagateFieldsFor(recordTypes);
+    }
 }
