@@ -1,8 +1,4 @@
-api test.provider {
-
-//    record TestParameter as KundenNr {
-//       string(16) KundenNr
-//    }
+api kunde.provider {
 
     record NameRec as Name {
     	string(64)   Vorname
@@ -18,11 +14,12 @@ api test.provider {
 		numeric(4)  GebJahr as GeburtsdatumJahr
 	}
 
-    record TestResult as Kunde {                                             
+    record ProviderOutput as Kunde {
+        numeric(8)       KundenNr                                          
 	    NameRec          Name
 	    GeburtsdatumRec  Geburtsdatum as GeburtsdatumNew		
-		numeric(16)      Festnetznummer replaces Telefonnummer
-		numeric(16)      Mobilfunknummer
+		string(16)       Festnetznummer replaces Telefonnummer
+		string(16)       Mobilfunknummer
 		string(256)      Mailadresse as MailadresseShortened
     }
     

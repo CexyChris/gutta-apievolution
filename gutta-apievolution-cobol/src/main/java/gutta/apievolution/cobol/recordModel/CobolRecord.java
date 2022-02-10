@@ -1,4 +1,4 @@
-package gutta.apievolution.cobol.copygen;
+package gutta.apievolution.cobol.recordModel;
 
 import java.util.Objects;
 

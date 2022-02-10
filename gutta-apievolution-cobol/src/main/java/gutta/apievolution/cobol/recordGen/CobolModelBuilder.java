@@ -1,31 +1,38 @@
-package gutta.apievolution.cobol.copygen;
+package gutta.apievolution.cobol.recordGen;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import gutta.apievolution.cobol.recordModel.AlphanumericCobolRecord;
+import gutta.apievolution.cobol.recordModel.CobolRecord;
+import gutta.apievolution.cobol.recordModel.ElementaryCobolRecord;
+import gutta.apievolution.cobol.recordModel.GroupCobolRecord;
+import gutta.apievolution.cobol.recordModel.NumericCobolRecord;
+import gutta.apievolution.cobol.recordModel.UsageClause;
 import gutta.apievolution.core.apimodel.BoundedStringType;
 import gutta.apievolution.core.apimodel.Field;
 import gutta.apievolution.core.apimodel.NumericType;
 import gutta.apievolution.core.apimodel.RecordType;
 import gutta.apievolution.core.apimodel.TypeVisitor;
 
-abstract class AbstractCobolModelBuilder implements TypeVisitor<CobolRecord>{
+abstract class CobolModelBuilder implements TypeVisitor<CobolRecord>{
 	
 	private Map<String, GroupCobolRecord> knownGroupRecords;
 	private Map<String, ElementaryCobolRecord> knownElementaryRecords;
+	
 	private int LevelNr;
 	private final int levelNrIncrement;
 	private String currentName;
 	
 	
-	AbstractCobolModelBuilder(int minLevelNr, int levelNrIncrement) {
+	CobolModelBuilder(int minLevelNr, int levelNrIncrement) {
 		this.knownGroupRecords = new HashMap<String, GroupCobolRecord>();
 		this.knownElementaryRecords = new HashMap<String, ElementaryCobolRecord>();
 		this.LevelNr = minLevelNr;
 		this.levelNrIncrement = levelNrIncrement;
 	}
 	
-	public GroupCobolRecord getForName(String name) {
+	GroupCobolRecord getForName(String name) {
 		return this.knownGroupRecords.get(name);
 	}
 	

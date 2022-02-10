@@ -1,13 +1,14 @@
-package gutta.apievolution.cobol.copygen;
+package gutta.apievolution.cobol.recordGen;
 
+import gutta.apievolution.cobol.recordModel.CobolRecord;
 import gutta.apievolution.core.apimodel.provider.ProviderApiDefinitionElement;
 import gutta.apievolution.core.apimodel.provider.ProviderApiDefinitionElementVisitor;
 import gutta.apievolution.core.apimodel.provider.ProviderRecordType;
 
-public class CobolProviderModelBuilder extends AbstractCobolModelBuilder
+public class ProviderCobolModelBuilder extends CobolModelBuilder
 implements ProviderApiDefinitionElementVisitor<CobolRecord> {
 	
-	CobolProviderModelBuilder(int minLevelNr, int levelNrIncrement) {
+	ProviderCobolModelBuilder(int minLevelNr, int levelNrIncrement) {
 		super(minLevelNr, levelNrIncrement);
 	}
 

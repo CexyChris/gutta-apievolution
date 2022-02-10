@@ -1,6 +1,8 @@
-package gutta.apievolution.cobol.copygen;
+package gutta.apievolution.cobol.moveGen;
 
 import java.util.Objects;
+
+import gutta.apievolution.cobol.recordModel.CobolConstants;
 
 public class MoveStatement {
 	

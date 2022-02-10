@@ -10,6 +10,8 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 
+import gutta.apievolution.cobol.recordGen.ConsumerCobolRecordGenerator;
+import gutta.apievolution.cobol.recordGen.ProviderCobolRecordGenerator;
 import gutta.apievolution.core.apimodel.consumer.ConsumerApiDefinition;
 import gutta.apievolution.core.apimodel.provider.ProviderApiDefinition;
 import gutta.apievolution.core.util.IntegerRange;
@@ -21,8 +23,8 @@ class CopyGeneratorTest {
 	@Test
 	void providerTest() throws IOException {
 		ClassLoader classLoader = this.getClass().getClassLoader();
-        List<InputStream> streams = Stream.of("apis/cobol-provider-revision-1.api",
-                "apis/cobol-provider-revision-2.api")
+        List<InputStream> streams = Stream.of("apis/Kunde-provider-revision-1.api",
+                "apis/Kunde-provider-revision-2.api")
                 .map(name -> classLoader.getResourceAsStream(name))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -30,7 +32,7 @@ class CopyGeneratorTest {
 		= ProviderApiLoader.loadHistoryFromStreams(IntegerRange.unbounded(), streams);
 		
 		File file = new File("myProviderCopy.cbl");
-		ProviderCopyGenerator generator = new ProviderCopyGenerator();
+		ProviderCobolRecordGenerator generator = new ProviderCobolRecordGenerator();
 		generator.generateCopy(apiDefinitions, "Kunde", file);
 		
 	}
@@ -38,11 +40,11 @@ class CopyGeneratorTest {
 	@Test
 	void test() throws IOException {
 		ClassLoader classLoader = this.getClass().getClassLoader();
-		InputStream inputStream = classLoader.getResourceAsStream("apis/cobol-consumer-api.api");
+		InputStream inputStream = classLoader.getResourceAsStream("apis/Kunde-consumer-revision-1.api");
         ConsumerApiDefinition consumerApi = ConsumerApiLoader.loadFromStream(inputStream, 0);
 		
 		File file = new File("myConsumerCopy.cbl");
-		ConsumerCopyGenerator generator = new ConsumerCopyGenerator();
+		ConsumerCobolRecordGenerator generator = new ConsumerCobolRecordGenerator();
 		generator.generateCopy(consumerApi, "Kunde", file);
 		
 	}

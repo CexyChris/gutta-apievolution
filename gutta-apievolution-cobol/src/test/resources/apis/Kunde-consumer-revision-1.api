@@ -1,8 +1,4 @@
-api test.consumer {
-
-//    record TestParameter as KundenNr {
-//        string(16) KundenNr
-//    }
+api kunde.consumer {
 
     record NameRec as Name {
     	string(64)   Vorname
@@ -10,11 +6,12 @@ api test.consumer {
 	    string(32)   Nachname
 	}
 	
-    record TestResult as Kunde {                                             
+    record ProviderOutput as Kunde {
+        numeric(8)   KundenNr
 	    NameRec      Name
 	    string(10)   Geburtsdatum                   
 		string(1)    Geschlecht
-		numeric(16)  Telefonnummer                    
+		string(16)   Telefonnummer                    
 		string(512)  Mailadresse
     }
     

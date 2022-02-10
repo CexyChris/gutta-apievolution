@@ -13,6 +13,8 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 
+import gutta.apievolution.cobol.moveGen.MoveGenerator;
+import gutta.apievolution.cobol.moveGen.UnresolvableNameException;
 import gutta.apievolution.core.apimodel.consumer.ConsumerApiDefinition;
 import gutta.apievolution.core.apimodel.provider.ProviderApiDefinition;
 import gutta.apievolution.core.apimodel.provider.RevisionHistory;
@@ -47,7 +49,7 @@ class MoveGeneratorTest {
     }
 
 	@Test
-	void OutputMoveTest() throws Exception {
+	void OutputMoveTest() throws UnresolvableNameException, IOException {
 		RevisionHistory providerRevisionHistory = this.loadRevisionHistory("apis/cobol-provider-revision-1.api",
                 "apis/cobol-provider-revision-2.api");
         ConsumerApiDefinition consumerApi = this.loadConsumerApi("apis/cobol-consumer-api.api", 0);
@@ -61,7 +63,7 @@ class MoveGeneratorTest {
 	}
 	
 	@Test
-	void InputMoveTest() throws Exception {
+	void InputMoveTest() throws UnresolvableNameException, IOException {
 		RevisionHistory providerRevisionHistory = this.loadRevisionHistory("apis/cobol-provider-revision-1.api",
                 "apis/cobol-provider-revision-2.api");
         ConsumerApiDefinition consumerApi = this.loadConsumerApi("apis/cobol-consumer-api.api", 0);

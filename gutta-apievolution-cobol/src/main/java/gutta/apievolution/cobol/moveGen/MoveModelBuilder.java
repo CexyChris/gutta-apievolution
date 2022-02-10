@@ -1,4 +1,4 @@
-package gutta.apievolution.cobol.copygen;
+package gutta.apievolution.cobol.moveGen;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,12 +18,15 @@ import gutta.apievolution.core.apimodel.consumer.ConsumerApiDefinitionElement;
 import gutta.apievolution.core.apimodel.consumer.ConsumerApiDefinitionElementVisitor;
 import gutta.apievolution.core.apimodel.consumer.ConsumerField;
 import gutta.apievolution.core.apimodel.consumer.ConsumerRecordType;
+import gutta.apievolution.core.apimodel.provider.ProviderApiDefinitionElement;
+import gutta.apievolution.core.apimodel.provider.ProviderApiDefinitionElementVisitor;
 import gutta.apievolution.core.apimodel.provider.ProviderField;
+import gutta.apievolution.core.apimodel.provider.ProviderRecordType;
 import gutta.apievolution.core.apimodel.provider.RevisionHistory;
 import gutta.apievolution.core.resolution.DefinitionResolution;
 import gutta.apievolution.core.resolution.DefinitionResolver;
 
-class MoveModelBuilder implements TypeVisitor<Consumer<Field>>, ConsumerApiDefinitionElementVisitor<Void> {
+class MoveModelBuilder implements TypeVisitor<Consumer<Field>>, ProviderApiDefinitionElementVisitor<Void> {
 	
 	private DefinitionResolution definitionResolution;
 	private List<MoveStatement> outputMoves;
@@ -37,20 +40,20 @@ class MoveModelBuilder implements TypeVisitor<Consumer<Field>>, ConsumerApiDefin
 		return inputMoves;
 	}
 
-	public void generateMoves(RevisionHistory revisionHistory
+	void buildMoves(RevisionHistory revisionHistory
 			, Set<Integer> supportedRevisions, ConsumerApiDefinition consumerApi
-			, String recordName, File outputFile) throws NoMappedTypeException {
+			, String recordName, File outputFile) throws UnresolvableNameException {
 		
 		this.outputMoves = new ArrayList<MoveStatement>();
 		
 		this.definitionResolution = new DefinitionResolver()
 				.resolveConsumerDefinition(revisionHistory, supportedRevisions, consumerApi);
-		Type consumerType = this.definitionResolution.resolveConsumerType(recordName);
-		if(consumerType == null) {
-			throw new NoMappedTypeException(recordName);
+		Type providerType = this.definitionResolution.resolveProviderType(recordName);
+		if(providerType == null) {
+			throw new UnresolvableNameException(recordName);
 		}
-		ConsumerApiDefinitionElement cade = (ConsumerApiDefinitionElement) consumerType;
-		cade.accept(this);
+		ProviderApiDefinitionElement pade = (ProviderApiDefinitionElement) providerType;
+		pade.accept(this);
 		
 		this.inputMoves = new ArrayList<MoveStatement>();
 		this.outputMoves.stream()
@@ -59,12 +62,12 @@ class MoveModelBuilder implements TypeVisitor<Consumer<Field>>, ConsumerApiDefin
 	}
 	
 	private void processGroupRecord(RecordType<?, ?, ?> recordType) {
-		for(Field consumerField: recordType.getDeclaredFields()) {
-			ProviderField providerField = 
-					this.definitionResolution.mapConsumerField((ConsumerField) consumerField);
-			if (providerField != null) { //if there is no mapping, there is nothing to do.
-				Consumer<Field> action = consumerField.getType().accept(this);
-				action.accept(consumerField);
+		for(Field providerField: recordType.getDeclaredFields()) {
+			ConsumerField consumerField = 
+					this.definitionResolution.mapProviderField((ProviderField) providerField);
+			if (consumerField != null) { //if there is no mapping, there is nothing to do.
+				Consumer<Field> action = providerField.getType().accept(this);
+				action.accept(providerField);
 			}
 		}
 	}
@@ -86,13 +89,13 @@ class MoveModelBuilder implements TypeVisitor<Consumer<Field>>, ConsumerApiDefin
 
 	private Consumer<Field> addMoveStatement() {
 		return f -> this.outputMoves.add(
-				new MoveStatement(f.getPublicName()
-						, this.definitionResolution.mapConsumerField((ConsumerField) f).getPublicName()));
+				new MoveStatement(f.getInternalName()
+						, this.definitionResolution.mapProviderField((ProviderField) f).getPublicName()));
 	}
 	
 	
 	@Override
-	public Void handleConsumerRecordType(ConsumerRecordType recordType) {
+	public Void handleProviderRecordType(ProviderRecordType recordType) {
 		this.processGroupRecord((RecordType) recordType);
 		return null;
 	}

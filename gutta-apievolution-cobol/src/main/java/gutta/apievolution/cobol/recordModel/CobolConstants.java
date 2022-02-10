@@ -1,4 +1,4 @@
-package gutta.apievolution.cobol.copygen;
+package gutta.apievolution.cobol.recordModel;
 
 public class CobolConstants {
 	
@@ -10,5 +10,7 @@ public class CobolConstants {
 	
 	public static final String MOVE = "MOVE";
 	public static final String TO   = "TO";
+	
+	public static final String SHORTHAND_VALUE_CLAUSE = "VALUE";
 
 }

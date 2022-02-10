@@ -1,4 +1,4 @@
-package gutta.apievolution.cobol.copygen;
+package gutta.apievolution.cobol.recordGen;
 
 import java.util.Properties;
 
@@ -6,12 +6,13 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 
-public abstract class CopyGenerator {
+public abstract class CobolRecordGenerator<B extends CobolModelBuilder> {
 	
 	private VelocityEngine velocityEngine;
 	private VelocityContext context;
+	private B builder;
 	
-	CopyGenerator() {			
+	CobolRecordGenerator() {			
         Properties properties = new Properties();
         properties.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
         properties.setProperty("classpath.resource.loader.class",
@@ -23,18 +24,26 @@ public abstract class CopyGenerator {
         this.context = new VelocityContext();
 	}
 	
-	void initContext(String recordName, AbstractCobolModelBuilder builder) {
-        this.getContext().put("root", builder.getForName(recordName));
-        this.getContext().put("groupRecordMap", builder.getKnownGroupRecords());
-        this.getContext().put("elementaryRecordMap", builder.getKnownElementaryRecords());
+	void initContext(String recordName) {
+        this.getContext().put("root", this.builder.getForName(recordName));
+        this.getContext().put("groupRecordMap", this.builder.getKnownGroupRecords());
+        this.getContext().put("elementaryRecordMap", this.builder.getKnownElementaryRecords());
 	}
 
-	public VelocityEngine getVelocityEngine() {
+	VelocityEngine getVelocityEngine() {
 		return velocityEngine;
 	}
 
-	public VelocityContext getContext() {
+	VelocityContext getContext() {
 		return context;
+	}
+	
+	B getBuilder() {
+		return this.builder;
+	}
+	
+	void setBuilder(B builder) {
+		this.builder = builder;
 	}
 	
 }

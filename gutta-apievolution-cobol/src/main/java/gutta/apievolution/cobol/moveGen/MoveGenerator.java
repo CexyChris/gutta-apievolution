@@ -1,4 +1,4 @@
-package gutta.apievolution.cobol.copygen;
+package gutta.apievolution.cobol.moveGen;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -20,9 +20,6 @@ public class MoveGenerator {
 	private VelocityEngine velocityEngine;
 	private VelocityContext context;
 	
-	private String providerSuffix;
-	private String consumerSuffix;
-	
 	public MoveGenerator() {
 		Properties properties = new Properties();
         properties.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
@@ -39,9 +36,9 @@ public class MoveGenerator {
 	
 	public void generateOutputMoves(RevisionHistory providerRevisionHistory
 			, Set<Integer> supportedRevisions,ConsumerApiDefinition consumerApi
-			, String recordName, File outputFile) throws NoMappedTypeException, IOException {
+			, String recordName, File outputFile) throws UnresolvableNameException, IOException {
 		
-		this.builder.generateMoves(providerRevisionHistory
+		this.builder.buildMoves(providerRevisionHistory
 				, supportedRevisions, consumerApi
 				, recordName, outputFile);
 		
@@ -52,9 +49,9 @@ public class MoveGenerator {
 	
 	public void generateInputMoves(RevisionHistory providerRevisionHistory
 			, Set<Integer> supportedRevisions,ConsumerApiDefinition consumerApi
-			, String recordName, File outputFile) throws NoMappedTypeException, IOException {
+			, String recordName, File outputFile) throws UnresolvableNameException, IOException {
 		
-		this.builder.generateMoves(providerRevisionHistory
+		this.builder.buildMoves(providerRevisionHistory
 				, supportedRevisions, consumerApi
 				, recordName, outputFile);
 		

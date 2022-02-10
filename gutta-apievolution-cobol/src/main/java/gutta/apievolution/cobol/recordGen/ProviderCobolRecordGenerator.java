@@ -1,4 +1,4 @@
-package gutta.apievolution.cobol.copygen;
+package gutta.apievolution.cobol.recordGen;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -9,16 +9,18 @@ import gutta.apievolution.core.apimodel.provider.ModelMerger;
 import gutta.apievolution.core.apimodel.provider.ProviderApiDefinition;
 import gutta.apievolution.core.apimodel.provider.RevisionHistory;
 
-public class ProviderCopyGenerator extends CopyGenerator {
+public class ProviderCobolRecordGenerator extends CobolRecordGenerator<ProviderCobolModelBuilder> {
+	
+	public ProviderCobolRecordGenerator() {
+		super();
+		this.setBuilder(new ProviderCobolModelBuilder(5, 5));
+	}
 	
 	public void generateCopy(List<ProviderApiDefinition> supportedDefinitions, String recordName, File outputFile) throws IOException {
 		RevisionHistory revisionHistory = new RevisionHistory(supportedDefinitions);
 		ProviderApiDefinition mergedDefinition = new ModelMerger().createMergedDefinition(revisionHistory);
-		
-		CobolProviderModelBuilder builder = new CobolProviderModelBuilder(5, 5);
-
-		mergedDefinition.forEach(u -> builder.build(u));
-		this.initContext(recordName, builder);
+		mergedDefinition.forEach(u -> this.getBuilder().build(u));
+		this.initContext(recordName);
 		
         try (FileWriter writer = new FileWriter(outputFile)) {
         	this.getVelocityEngine().mergeTemplate("cobol/GenerateRecords.vt", "UTF-8", this.getContext(), writer);

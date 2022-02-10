@@ -5,9 +5,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -16,12 +18,21 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.StringUtils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import gutta.apievolution.core.apimodel.AtomicType;
+import gutta.apievolution.core.apimodel.BoundedStringType;
 import gutta.apievolution.core.apimodel.Field;
+import gutta.apievolution.core.apimodel.NumericType;
 import gutta.apievolution.core.apimodel.RecordType;
 import gutta.apievolution.core.apimodel.Type;
 import gutta.apievolution.core.apimodel.TypeVisitor;
 import gutta.apievolution.core.apimodel.consumer.ConsumerApiDefinition;
+import gutta.apievolution.core.apimodel.consumer.ConsumerField;
 import gutta.apievolution.core.apimodel.provider.ProviderApiDefinition;
+import gutta.apievolution.core.apimodel.provider.ProviderField;
+import gutta.apievolution.core.apimodel.provider.ProviderRecordType;
 import gutta.apievolution.core.apimodel.provider.RevisionHistory;
 import gutta.apievolution.core.resolution.DefinitionResolution;
 import gutta.apievolution.core.resolution.DefinitionResolver;
@@ -56,88 +67,164 @@ class CobolMappingTest {
         }
     }
     
-    private static final String KundenNr = "0123456789ABCDEF";
-
 	@Test
 	void testCobolConversation() throws IOException {
-        RevisionHistory providerRevisionHistory = this.loadRevisionHistory("apis/cobol-provider-revision-1.api",
-                "apis/cobol-provider-revision-2.api");
-        ConsumerApiDefinition consumerApi = this.loadConsumerApi("apis/cobol-consumer-api.api", 0);
+        RevisionHistory providerRevisionHistory = this.loadRevisionHistory("apis/Kunde-provider-revision-1.api",
+                "apis/Kunde-provider-revision-2.api");
+        ConsumerApiDefinition consumerApi = this.loadConsumerApi("apis/Kunde-consumer-revision-1.api", 0);
 
         Set<Integer> supportedRevisions = new HashSet<>(Arrays.asList(0, 1));
         DefinitionResolution definitionResolution = new DefinitionResolver().resolveConsumerDefinition(providerRevisionHistory, supportedRevisions, consumerApi);
       
         //End of copied code ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        
+        Type providerOutputType =  definitionResolution.resolveProviderType("Kunde");
+        if (providerOutputType instanceof RecordType) {
+            RecordType<?, ?, ?> recordType = (RecordType<?, ?, ?>) providerOutputType;
+            this.printFields(recordType);
+        }
+        
+        KundeRecResolution kundeRes = createKundeRecResolution();
+        
+        System.out.println("************");
+        Type consumerInputType = definitionResolution.mapProviderType(providerOutputType);
 
-        Type consumerOutput = definitionResolution.resolveConsumerType("KundenNr");
+        RecordType<?, ?, ?> consumerRecordType = (RecordType<?, ?, ?>) consumerInputType;
+        RecordType<?, ?, ?> providerRecordType = (RecordType<?, ?, ?>) providerOutputType;
+        Map<Field<?, ?>, int[]> consumerOffsetMap = new offsetMapper(consumerRecordType).getMap();
+        Map<Field<?, ?>, int[]> providerOffsetMap = new offsetMapper(providerRecordType).getMap();
         
-        Type providerInput  =  definitionResolution.mapConsumerType(consumerOutput);
+        System.out.println("************");
+        printOffsetMapping(providerOffsetMap);
+        System.out.println("************");
+        printOffsetMapping(consumerOffsetMap);
+        byte[] consumerContent = new byte[KundeRecRevision1.MY_DATA_STRUCTURE_len];
+        consumerContent = this.writeProviderToConsumer(providerRecordType, kundeRes.getByteBuffer(), consumerContent, definitionResolution, consumerOffsetMap, providerOffsetMap);
+        KundeRecRevision1 kunde = new KundeRecRevision1(consumerContent);
         
-        
-        //Create an Object, which looks like the Provider's internal Representation
-        //i.e. the provider has now filled its copybook and is ready to send it to the consoomer.
-        String vorname = padRight("Christoph", 64);
-        String nameFiller1 = " ";
-        String nachnameProlonged = padRight("Buck", 64);
-        String gebTag = "06";
-        String gebFiller1 = ":";
-        String gebMonat = "09";
-        String gebFiller2 = ":";
-        String gebJahr ="1995";
-        String festnetznummer = padRight("0511362", 16);
-        String mobilfunknummer = padRight("1481", 16);
-        String mailadresseShortened = padRight("mail@ivv.de", 256);
+        assertEquals(padRight(KundeConstants.VORNAME, 64), kunde.getVorname());
+        assertEquals(padRight(KundeConstants.NACHNAME, 32), kunde.getNachname());
+        assertEquals(padRight(KundeConstants.MAILADRESSE, 512), kunde.getMailadresse());
+        assertEquals(KundeConstants.FESTNETZNUMMER, kunde.getTelefonnummer());
+        assertEquals(KundeConstants.GEBURTSDATUM, kunde.getGeburtsdatum());
+        assertTrue(kunde.isMaennlich());
 
-        String nameNew = vorname + nameFiller1 + nachnameProlonged;
-        String geburtsdatumNew = gebTag + gebFiller1 + gebMonat + gebFiller2 + gebJahr;
-        
-        String KundeRevision2 = nameNew + geburtsdatumNew + festnetznummer + mobilfunknummer + mailadresseShortened; 
-        
-        
-        Type providerOutput =  definitionResolution.resolveProviderType("Kunde");
-        Type consumerInput = definitionResolution.mapProviderType(providerOutput);
-        
-        CobolFieldVisitor visitor = new CobolFieldVisitor();
-        providerOutput.accept(visitor);
-        System.out.println("++++++++++++++++++++++++++++++++++");
-        consumerInput.accept(visitor);
 	}
 	
+	private byte[] writeProviderToConsumer(RecordType<?, ?, ?> providerRecordType, byte[] providerContent, byte[] consumerContent 
+			, DefinitionResolution defRes, Map<Field<?, ?>, int[]> consumerOffsetMap, Map<Field<?, ?>, int[]> providerOffsetMap) {
+		
+		for( Field<?, ?> field : providerRecordType.getDeclaredFields()) {
+			if(field.getType() instanceof RecordType) {
+				writeProviderToConsumer((RecordType) field.getType(), providerContent, consumerContent, defRes, consumerOffsetMap, providerOffsetMap);
+			} else {
+				ConsumerField cf = defRes.mapProviderField((ProviderField) field);
+				if(cf != null) {
+					System.out.println(cf.getPublicName());
+					int[] coffset = consumerOffsetMap.get(cf);
+					int[] poffset = providerOffsetMap.get(field);
+					for(int i = 0; i < poffset[1]; i++) {
+						consumerContent[coffset[0] + i] = providerContent[poffset[0] + i];
+					}
+				}
+			}
+		}
+		return consumerContent;
+	}
+
+	private class offsetMapper implements TypeVisitor<Boolean> {
+		private int offset;
+		private int length;
+		private Map<Field<?,?>, int[]> map;
+		
+		public offsetMapper(RecordType<?, ?, ?> type) {
+			this.offset = 0;
+			this.map = new HashMap<Field<?, ?>, int[]>();
+			this.handleRecordType(type);
+		}
+		
+		private void mapOffsets(Field<?, ?> field) {
+			if(field.getType().accept(this)) {
+				int[] offsetAndLength = {this.offset, this.length};
+				this.map.putIfAbsent(field, offsetAndLength);
+				this.offset = this.offset + this.length;
+			}
+		}
+		
+		@Override
+		public Boolean handleBoundedStringType(BoundedStringType boundedStringType) {
+			this.length = boundedStringType.getBound();
+			return true;
+		}
+		
+		@Override
+		public Boolean handleNumericType(NumericType numericType) {
+			this.length = numericType.getIntegerPlaces() + numericType.getFractionalPlaces();
+			return true;
+		}
+
+		@Override
+		public Boolean handleRecordType(RecordType<?, ?, ?> recordType) {
+			recordType.getDeclaredFields().forEach(f -> this.mapOffsets(f));
+			return false;
+		}
+		
+		public Map<Field<?, ?>, int[]> getMap() {
+			return this.map;
+		}
+		
+	}
+
+
 	private static String padRight(String s, int n) {
 	     return String.format("%-" + n + "s", s);  
 	}
 	
-	private class CobolFieldVisitor implements TypeVisitor<Void> {
-		
-		@Override
-		public Void handleRecordType(RecordType<?, ?, ?> recordType) {
-			Iterator<?> iterator = recordType.iterator();
-			while(iterator.hasNext()) {
-				System.out.println(iterator.next().toString());
-			}
-			return null;
-		}
+	private void printFields(RecordType<?, ?, ?> recordType) {
+        for(Field<?, ?> field: recordType.getDeclaredFields()) {
+        	System.out.println(
+        			field.getOptionality() + ": " 
+        		  + field.getInternalName() + " --> " 
+        		  + field.getPublicName()
+        	);
+        	Type fieldType = field.getType();
+        	if (fieldType instanceof RecordType) {
+        		RecordType<?, ?, ?> nextRecordType = (RecordType<?, ?, ?>) fieldType;
+        		this.printFields(nextRecordType);
+        	}
+        }
+	}
+	
+	private static void printOffsetMapping(Map<Field<?, ?>, int[]> mapping) {
+        for(Field<?, ?> field : mapping.keySet()) {
+        	int[] i = mapping.get(field);
+        	System.out.println(field.getInternalName() + " --> " + "[" + i[0] + ", " + i[1] + "]");
+        }
+	}
+	
+	
+	private static KundeRecResolution createKundeRecResolution() {
+        KundeRecResolution kundeRes = new KundeRecResolution();
+        //NameNew
+        kundeRes.setVorname(KundeConstants.VORNAME);
+        kundeRes.setNachnameprolonged(KundeConstants.NACHNAME);
+        kundeRes.setNachname(KundeConstants.NACHNAME);
+        //GeburtsdatumNew
+        kundeRes.setGeburtsdatumtag(KundeConstants.GEBURTSDATUM_TAG);
+        kundeRes.setGeburtsdatummonat(KundeConstants.GEBURTSDATUM_MONAT);
+        kundeRes.setGeburtsdatumjahr(KundeConstants.GEBURTSDATUM_JAHR);
+        
+        kundeRes.setFestnetznummer(KundeConstants.FESTNETZNUMMER);
+        kundeRes.setMobilfunknummer(KundeConstants.MOBILFUNKNUMMER);
+        kundeRes.setMailadresseshortened(KundeConstants.MAILADRESSE);
+        //Name
+        kundeRes.setGeschlecht(KundeConstants.GESCHLECHT);
+        kundeRes.setGeburtsdatum(KundeConstants.GEBURTSDATUM);
+        kundeRes.setMailadresse(KundeConstants.MAILADRESSE);
+        
+        return kundeRes;
 	}
 	
 
-	
-	private class KundeProviderRevision2Copy {
-		
-		private String content;
-		
-		public KundeProviderRevision2Copy(String kundeRecord) throws Exception {
-			if(kundeRecord.length() != 427) {
-				throw new Exception("Die Zeichenkette ist kein Kunde in Revision 2!");
-			}
-			this.content = kundeRecord;
-		}
-		
-		public String getNameNew() {
-			return content.substring(0, 130);
-		}
-		public String getVorname() {
-			return content.substring(0, 65);
-		}
-	}
 
 }

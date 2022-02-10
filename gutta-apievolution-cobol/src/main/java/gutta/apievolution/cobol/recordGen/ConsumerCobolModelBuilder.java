@@ -1,12 +1,13 @@
-package gutta.apievolution.cobol.copygen;
+package gutta.apievolution.cobol.recordGen;
 
+import gutta.apievolution.cobol.recordModel.CobolRecord;
 import gutta.apievolution.core.apimodel.consumer.ConsumerApiDefinitionElement;
 import gutta.apievolution.core.apimodel.consumer.ConsumerApiDefinitionElementVisitor;
 import gutta.apievolution.core.apimodel.consumer.ConsumerRecordType;
 
-public class CobolConsumerModelBuilder extends AbstractCobolModelBuilder implements ConsumerApiDefinitionElementVisitor<CobolRecord> {
+public class ConsumerCobolModelBuilder extends CobolModelBuilder implements ConsumerApiDefinitionElementVisitor<CobolRecord> {
 
-	CobolConsumerModelBuilder(int minLevelNr, int levelNrIncrement) {
+	ConsumerCobolModelBuilder(int minLevelNr, int levelNrIncrement) {
 		super(minLevelNr, levelNrIncrement);
 	}
 	

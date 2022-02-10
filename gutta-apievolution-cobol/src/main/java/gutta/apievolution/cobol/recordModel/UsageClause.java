@@ -1,4 +1,4 @@
-package gutta.apievolution.cobol.copygen;
+package gutta.apievolution.cobol.recordModel;
 
 public enum UsageClause {
 	
@@ -7,16 +7,14 @@ public enum UsageClause {
 	PACKEDDECIMAL("PACKED-DECIMAL"),
 	INDEX("INDEX");
 	
-	private String text;
+	private String usage;
 
 	public String getText() {
-		return text;
+		return usage;
 	}
 	
 	private UsageClause(String text) {
-		this.text = text;
+		this.usage = text;
 	}
-	
-	
 
 }
