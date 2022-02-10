@@ -1,0 +1,9 @@
+api zahlung.provider {
+	
+    record ProviderInput1 as Zahlung {
+	    numeric(8)   VorgangsNr replaces AuftragsNr
+	    numeric(8)   KundenNr                   
+		numeric(5)   Betrag
+    }
+    
+}

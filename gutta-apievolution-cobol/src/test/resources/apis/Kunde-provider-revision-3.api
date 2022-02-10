@@ -1,0 +1,26 @@
+api kunde.provider {
+
+    record NameRec as Name {
+    	string(64)   Vorname
+	    string(1)    NameFiller1 as FILLER
+	    string(64)   Nachname as NachnameProlonged
+	}
+	
+	record GeburtsdatumRec as Geburtsdatum {
+		numeric(2)  GebTag as GeburtsdatumTag
+	    string(1)   GebFiller1 as FILLER
+		numeric(2)  GebMonat as GeburtsdatumMonat
+	    string(1)   GebFiller2 as FILLER1
+		numeric(4)  GebJahr as GeburtsdatumJahr
+	}
+
+    record ProviderOutput as Kunde {
+        numeric(8)       KundenNr                                          
+	    NameRec          Name
+	    GeburtsdatumRec  Geburtsdatum as GeburtsdatumNew		
+		string(16)       Festnetznummer
+		string(16)       Mobilfunknummer
+		string(512)      Mailadresse
+    }
+    
+}

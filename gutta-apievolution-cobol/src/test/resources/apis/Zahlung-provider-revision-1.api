@@ -1,0 +1,10 @@
+api zahlung.provider {
+	
+    record ProviderInput1 as Zahlung {
+        string(8)    Stichwort
+	    numeric(8)   AuftragsNr
+	    numeric(8)   KundenNr                   
+		numeric(5)   Betrag
+    }
+    
+}
